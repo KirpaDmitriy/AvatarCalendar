@@ -1,10 +1,43 @@
 from datetime import datetime, timedelta
 from functools import reduce
+from typing import  List
 
-from libs.bd import get_time_segment_user_events, check_intersections
+from libs.bd import get_time_segment_user_events, get_enveloping_user_events
 from libs.geography import GeoStuff
 from models.event import EventCalendar
 from libs.priority import PriorityEstimator
+
+
+
+async def check_intersections(
+    event: EventCalendar,
+    user_id
+) -> List[EventCalendar]:  # список событий, накладывающихся на переданное в аргументах событие
+
+    overlapping_events_cursor_bin = await get_time_segment_user_events(
+        user_id=user_id,
+        before_ts=event.date_time_end,
+        after_ts=event.date_time_begin,
+        event_beginning=True
+    )
+    intersecting_events = [EventCalendar(**event) async for event in overlapping_events_cursor_bin]
+    
+    overlapping_events_cursor_fin = await get_time_segment_user_events(
+        user_id=user_id,
+        before_ts=event.date_time_end,
+        after_ts=event.date_time_begin,
+        event_beginning=False
+    )
+    intersecting_events.extend([EventCalendar(**event) async for event in overlapping_events_cursor_fin])
+    
+    enveloping_events_cursor = await get_enveloping_user_events(
+        user_id=user_id,
+        begin_ts=event.date_time_begin,
+        end_ts=event.date_time_end
+    )
+    intersecting_events.extend([EventCalendar(**event) async for event in enveloping_events_cursor])
+
+    return intersecting_events
 
 async def generate_event_variants(user_id, duration, location_begin, location_end):
     considered_start = datetime.now().replace(minute=0, second=0) + timedelta(hours=1)

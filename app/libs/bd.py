@@ -50,37 +50,6 @@ async def get_time_segment_user_events(
     return cursor
 
 
-async def check_intersections(
-    event: EventCalendar,
-    user_id
-) -> List[EventCalendar]:  # список событий, накладывающихся на переданное в аргументах событие
-
-    overlapping_events_cursor_bin = await get_time_segment_user_events(
-        user_id=user_id,
-        before_ts=event.date_time_end,
-        after_ts=event.date_time_begin,
-        event_beginning=True
-    )
-    intersecting_events = [EventCalendar(**event) async for event in overlapping_events_cursor_bin]
-    
-    overlapping_events_cursor_fin = await get_time_segment_user_events(
-        user_id=user_id,
-        before_ts=event.date_time_end,
-        after_ts=event.date_time_begin,
-        event_beginning=False
-    )
-    intersecting_events.extend([EventCalendar(**event) async for event in overlapping_events_cursor_fin])
-    
-    enveloping_events_cursor = await get_enveloping_user_events(
-        user_id=user_id,
-        begin_ts=event.date_time_begin,
-        end_ts=event.date_time_end
-    )
-    intersecting_events.extend([EventCalendar(**event) async for event in enveloping_events_cursor])
-
-    return intersecting_events
-
-
 async def get_enveloping_user_events(
     user_id,
     begin_ts: Optional[datetime] = None,
@@ -112,3 +81,4 @@ async def get_enveloping_user_events(
     }
     cursor = event_coll.find(query)
     return cursor
+
