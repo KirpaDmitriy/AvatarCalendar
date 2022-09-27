@@ -53,7 +53,7 @@ async def get_time_segment_user_events(
 async def check_intersections(
     event: EventCalendar,
     user_id
-) -> List[EventCalendar]:
+) -> List[EventCalendar]:  # список событий, накладывающихся на переданное в аргументах событие
 
     overlapping_events_cursor_bin = await get_time_segment_user_events(
         user_id=user_id,
@@ -85,7 +85,7 @@ async def get_enveloping_user_events(
     user_id,
     begin_ts: Optional[datetime] = None,
     end_ts: Optional[datetime] = None,
-):
+):  # вспом функция, которая доставала события, целиком включающие переданное в аргументах. Пример: пары с 9 до 18, обед с 13 до 14. Для события обед вернёт событие пары
     event_coll = event_collection()
     time_filter = {}
     if not begin_ts and end_ts:
