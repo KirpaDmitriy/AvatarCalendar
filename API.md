@@ -1,6 +1,8 @@
 <h1>API модуля</h1>
 
 <h2>main.py -> get_prority</h2>
+По тексту события определяет его приоритет.
+
 <h4>Вход</h4>
 Строка-описание события
 
@@ -10,6 +12,8 @@
 <hr>
 
 <h2>main.py -> get_transfer_variants</h2>
+Определяет, куда в календаре можно поставить новое собтие с учётом уже занесённых пользователем в календарь.
+
 <h4>Вход</h4>
 event - сущность <a href="https://github.com/KirpaDmitriy/AvatarCalendar/blob/7dd6ae9e47763ff114756b842087eebbecccef27/app/models/event.py">EventCalendar</a>, user_id - строка-айди пользователя
 <h4>Выход</h4>
